@@ -65,18 +65,15 @@ async function run(config) {
                     if (selectorRule.selector == "") {
                         return null;
                     } else if (selectorRule.selector == ":scope") {
-                        // Return as array to unify return type.
+                        // Return in array to unify return type.
                         return [handle];
                     } else {
-                        // Return as array to unify return type.
                         return await handle.$$(selectorRule.selector);
                     }
                 case enums.SelectorType.XPath:
-                    // Use Chrome XPath helper for easy XPath and unified return type, 
-                    // https://developer.chrome.com/docs/devtools/console/utilities/#xpath-function
                     return await handle.$x(selectorRule.selector);
                 case enums.SelectorType.Manual:
-                    // Return as array to unify return type.
+                    // Return in array to unify return type.
                     return [await page.evaluateHandle((selector) => {
                         let el = document.createElement("p");
                         el.innerText = selector;
