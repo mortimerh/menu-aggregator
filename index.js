@@ -97,11 +97,11 @@ async function run(config) {
                     ...rule,
                     label: {
                         ...rule.label,
-                        value: await labelHandle?.evaluate(n => n.innerText)
+                        value: await labelHandle?.evaluate(n => n.textContent)
                     },
                     dish: {
                         ...rule.dish,
-                        value: await dishHandle?.evaluate(n => n.innerText)
+                        value: await dishHandle?.evaluate(n => n.textContent)
                     }
                 });
             }

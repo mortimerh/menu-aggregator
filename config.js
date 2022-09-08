@@ -18,13 +18,10 @@ module.exports = {
                         selectorType: SelectorType.CSS,
                         selector: "strong",
                     },
+                    
                     dish: {
-                        selectorType: SelectorType.CSS,
-                        selector: ":scope",
-                        filters: [{
-                            type: FilterType.RegExp,
-                            argument: "(?:\\n|\n)(.+)"
-                        }]
+                        selectorType: SelectorType.XPath,
+                        selector: "./strong/following::br/following::text()"
                     }
                 }
             ]
