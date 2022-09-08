@@ -40,10 +40,8 @@ module.exports = {
                         selector: "#dagens"
                     },
                     label: {
-                        filters: [{
-                            type: FilterType.Override,
-                            argument: "Dagens"
-                        }],
+                        selectorType: SelectorType.Manual,
+                        selector: "Dagens"
                     },
                     dish: {
                         selectorType: SelectorType.CSS,
@@ -56,10 +54,8 @@ module.exports = {
                         selector: "#dagens"
                     },
                     label: {
-                        filters: [{
-                            type: FilterType.Override,
-                            argument: "Vegetarisk"
-                        }],
+                        selectorType: SelectorType.Manual,
+                        selector: "Vegetarisk"
                     },
                     dish: {
                         selectorType: SelectorType.CSS,

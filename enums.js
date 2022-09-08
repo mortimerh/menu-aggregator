@@ -7,9 +7,9 @@ module.exports = {
         Daily: 0, Weekly: 1, Monthly: 2, Permanent: 3
     },
     FilterType: {
-        RegExp: 0, Trim: 1, Override: 3
+        RegExp: 0, Trim: 1
     },
     SelectorType: {
-        CSS: 0, XPath: 1
+        CSS: 0, XPath: 1, Manual: 2
     }
 }
