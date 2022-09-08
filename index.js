@@ -7,12 +7,17 @@ const myConfig = require('./config');
 const enums = require('./common/enums');
 
 
-function applyFilters(resultItem) {
-    if (resultItem.label.filters) {
-        resultItem.label.value = resultItem.label.filters.reduce(applyFilter, resultItem.label.value);
+function applyFilters(resultItem, globalFilters) {
+    globalFilters = globalFilters ?? [];
+
+    const labelFilters = (resultItem.label.filters ?? []).concat(globalFilters);
+    if (labelFilters.length > 0) {
+        resultItem.label.value = labelFilters.reduce(applyFilter, resultItem.label.value);
     }
-    if (resultItem.dish.filters) {
-        resultItem.dish.value = resultItem.dish.filters.reduce(applyFilter, resultItem.dish.value);
+    
+    const dishFilters = (resultItem.dish.filters ?? []).concat(globalFilters);
+    if (dishFilters.length > 0) {
+        resultItem.dish.value = dishFilters.reduce(applyFilter, resultItem.dish.value);
     }
 
     return resultItem;
@@ -102,7 +107,7 @@ async function run(config) {
             }
         }
 
-        let siteResults = results.map(r => applyFilters(r));
+        let siteResults = results.map(r => applyFilters(r, config.global?.filters));
 
         globalResults.push({
             name: siteConfig.name,
