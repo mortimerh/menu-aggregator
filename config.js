@@ -1,4 +1,4 @@
-const { FilterType, ScraperRuleType, Days} = require('./enums');
+const { FilterType, ScraperRuleType, Days, SelectorType } = require('./enums');
 
 module.exports = {
     screenshotsOutputDir: "./screenshots",
@@ -10,13 +10,22 @@ module.exports = {
             scraperRules: [
                 {
                     type: ScraperRuleType.Weekly,
-                    itemSelector: "#page-zones__main-widgets__content > .bk-content-text > p",
-                    labelSelector: "strong",
-                    dishSelector: ":scope",
-                    dishFilters: [{
-                        type: FilterType.RegExp,
-                        argument: "(?:\\n|\n)(.+)"
-                    }]
+                    items: {
+                        selectorType: SelectorType.CSS,
+                        selector: "#page-zones__main-widgets__content > .bk-content-text > p",
+                    },
+                    label: {
+                        selectorType: SelectorType.CSS,
+                        selector: "strong",
+                    },
+                    dish: {
+                        selectorType: SelectorType.CSS,
+                        selector: ":scope",
+                        filters: [{
+                            type: FilterType.RegExp,
+                            argument: "(?:\\n|\n)(.+)"
+                        }]
+                    }
                 }
             ]
         },
@@ -26,24 +35,40 @@ module.exports = {
             url: "https://restaurangspill.se/",
             scraperRules: [
                 {
-                    itemSelector: "#dagens",
-                    labelFilters: [{
-                        type: FilterType.Override,
-                        argument: "Dagens"
-                    }],
-                    dishSelector: ":scope > div > div.space-y-4 > div > div > div.space-y-4 > div"
+                    items: {
+                        selectorType: SelectorType.CSS,
+                        selector: "#dagens"
+                    },
+                    label: {
+                        filters: [{
+                            type: FilterType.Override,
+                            argument: "Dagens"
+                        }],
+                    },
+                    dish: {
+                        selectorType: SelectorType.CSS,
+                        selector: ":scope > div > div.space-y-4 > div > div > div.space-y-4 > div"
+                    }
                 },
                 {
-                    itemSelector: "#dagens",
-                    labelFilters: [{
-                        type: FilterType.Override,
-                        argument: "Vegetarisk"
-                    }],
-                    dishSelector: ":scope > div > div.space-y-4 > div > div > div.space-y-4 > p > div",
-                    dishFilters: [{
-                        type: FilterType.RegExp,
-                        argument: "(.+?)(?=\n)"
-                    }]
+                    items: {
+                        selectorType: SelectorType.CSS,
+                        selector: "#dagens"
+                    },
+                    label: {
+                        filters: [{
+                            type: FilterType.Override,
+                            argument: "Vegetarisk"
+                        }],
+                    },
+                    dish: {
+                        selectorType: SelectorType.CSS,
+                        selector: ":scope > div > div.space-y-4 > div > div > div.space-y-4 > p > div",
+                        filters: [{
+                            type: FilterType.RegExp,
+                            argument: "(.+?)(?=\n)"
+                        }]
+                    }
                 }
             ]
         },
@@ -55,40 +80,85 @@ module.exports = {
                 {
                     type: ScraperRuleType.Daily,
                     day: Days.Monday,
-                    itemSelector: "#monday tr",
-                    labelSelector: ".course_type > p",
-                    dishSelector: ".course_description > p",
+                    items: {
+                        selectorType: SelectorType.CSS,
+                        selector: "#monday tr"
+                    },
+                    label: {
+                        selectorType: SelectorType.CSS,
+                        selector: ".course_type > p"
+                    },
+                    dish: {
+                        selectorType: SelectorType.CSS,
+                        selector: ".course_description > p",
+                    }
                 },
                 {
                     type: ScraperRuleType.Daily,
                     day: Days.Tuesday,
-                    itemSelector: "#tuesday tr",
-                    labelSelector: ".course_type > p",
-                    dishSelector: ".course_description > p",
+                    items: {
+                        selectorType: SelectorType.CSS,
+                        selector: "#tuesday tr"
+                    },
+                    label: {
+                        selectorType: SelectorType.CSS,
+                        selector: ".course_type > p"
+                    },
+                    dish: {
+                        selectorType: SelectorType.CSS,
+                        selector: ".course_description > p"
+                    }
                 },
                 {
 
                     type: ScraperRuleType.Daily,
                     day: Days.Wednesday,
-                    itemSelector: "#wednesday tr",
-                    labelSelector: ".course_type > p",
-                    dishSelector: ".course_description > p",
+                    items: {
+                        selectorType: SelectorType.CSS,
+                        selector: "#wednesday tr"
+                    },
+                    label: {
+                        selectorType: SelectorType.CSS,
+                        selector: ".course_type > p"
+                    },
+                    dish: {
+                        selectorType: SelectorType.CSS,
+                        selector: ".course_description > p"
+                    },
                 },
                 {
 
                     type: ScraperRuleType.Daily,
                     day: Days.Thursday,
-                    itemSelector: "#thursday tr",
-                    labelSelector: ".course_type > p",
-                    dishSelector: ".course_description > p",
+                    items: {
+                        selectorType: SelectorType.CSS,
+                        selector: "#thursday tr"
+                    },
+                    label: {
+                        selectorType: SelectorType.CSS,
+                        selector: ".course_type > p"
+                    },
+                    dish: {
+                        selectorType: SelectorType.CSS,
+                        selector: ".course_description > p"
+                    },
                 },
                 {
 
                     type: ScraperRuleType.Daily,
                     day: Days.Friday,
-                    itemSelector: "#friday tr",
-                    labelSelector: ".course_type > p",
-                    dishSelector: ".course_description > p",
+                    items: {
+                        selectorType: SelectorType.CSS,
+                        selector: "#friday tr"
+                    },
+                    label: {
+                        selectorType: SelectorType.CSS,
+                        selector: ".course_type > p"
+                    },
+                    dish: {
+                        selectorType: SelectorType.CSS,
+                        selector: ".course_description > p"
+                    },
                 },
             ]
         }]

@@ -8,11 +8,11 @@ const { FilterType, ScraperRuleType, Days } = require('./enums');
 
 
 function applyFilters(resultItem) {
-    if (resultItem.labelFilters) {
-        resultItem.label = resultItem.labelFilters.reduce(applyFilter, resultItem.label);
+    if (resultItem.label.filters) {
+        resultItem.label.value = resultItem.label.filters.reduce(applyFilter, resultItem.label.value);
     }
-    if (resultItem.dishFilters) {
-        resultItem.dish = resultItem.dishFilters.reduce(applyFilter, resultItem.dish);
+    if (resultItem.dish.filters) {
+        resultItem.dish.value = resultItem.dish.filters.reduce(applyFilter, resultItem.dish.value);
     }
 
     return resultItem;
@@ -37,9 +37,9 @@ function applyFilter(value, filter) {
 
 function menuItemToString(menuItem) {
     if (menuItem.type == ScraperRuleType.Daily && menuItem.day) {
-        return `${Object.keys(Days)[menuItem.day - 1]} - ${menuItem.label} - ${menuItem.dish}`;
+        return `${Object.keys(Days)[menuItem.day - 1]} - ${menuItem.label.value} - ${menuItem.dish.value}`;
     } else {
-        return `${menuItem.label} - ${menuItem.dish}`;
+        return `${menuItem.label.value} - ${menuItem.dish.value}`;
     }
 }
 
@@ -70,16 +70,22 @@ async function run(config) {
             let results = [];
 
             for (let rule of scraperRules) {
-                let itemNodes = document.querySelectorAll(rule.itemSelector);
+                let itemNodes = document.querySelectorAll(rule.items.selector);
 
                 for (let itemNode of itemNodes) {
-                    let labelNode = handleSelector(rule.labelSelector, itemNode);
-                    let dishNode = handleSelector(rule.dishSelector, itemNode);
+                    let labelNode = handleSelector(rule.label.selector, itemNode);
+                    let dishNode = handleSelector(rule.dish.selector, itemNode);
 
                     results.push({
                         ...rule,
-                        label: labelNode?.innerText,
-                        dish: dishNode?.innerText
+                        label: {
+                            ... rule.label,
+                            value: labelNode?.innerText
+                        },
+                        dish: {
+                            ... rule.dish, 
+                            value: dishNode?.innerText
+                        }
                     });
                 }
             }
