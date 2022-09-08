@@ -4,7 +4,6 @@ const restaurangSpill = require('./restaurants/restaurang-spill');
 const zenThai = require('./restaurants/zen-thai');
 
 module.exports = {
-    screenshotsOutputDir: "./screenshots",
     sites: [
         dockansHamnkrog,
         restaurangP2,

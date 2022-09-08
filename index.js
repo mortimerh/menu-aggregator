@@ -46,17 +46,12 @@ function menuItemToString(menuItem) {
 }
 
 async function run(config) {
-    if (!fs.existsSync(config.screenshotsOutputDir)) {
-        fs.mkdirSync(config.screenshotsOutputDir);
-    }
-
     const browser = await puppeteer.launch();
     let globalResults = [];
 
     for (let siteConfig of config.sites.filter(s => s.active)) {
         const page = await browser.newPage();
         await page.goto(siteConfig.url);
-        await page.screenshot({ path: path.join(config.screenshotsOutputDir, siteConfig.name) + ".png" });
         page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
 
         const evaluateSelector = async function (selectorRule, handle) {
