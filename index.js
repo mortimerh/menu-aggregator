@@ -4,7 +4,7 @@ const path = require('path');
 const re2 = RegExp; // @fixme actually use re2
 
 const myConfig = require('./config');
-const enums = require('./enums');
+const enums = require('./common/enums');
 
 
 function applyFilters(resultItem) {
