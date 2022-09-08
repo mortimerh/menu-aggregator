@@ -19,6 +19,10 @@ function applyFilters(resultItem) {
 }
 
 function applyFilter(value, filter) {
+    if (! value) {
+        return value;
+    }
+
     switch (filter.type) {
         case enums.FilterType.Trim:
             return value.trim();
@@ -55,59 +59,58 @@ async function run(config) {
         await page.screenshot({ path: path.join(config.screenshotsOutputDir, siteConfig.name) + ".png" });
         page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
 
-        let siteResults = (await page.evaluate(function (scraperRules, enums) {
-            const handleSelector = function (selectorRule, node) {
-                switch (selectorRule.selectorType) {
-                    case enums.SelectorType.CSS:
-                        if (selectorRule.selector == "") {
-                            return null;
-                        } else if (selectorRule.selector == ":scope") {
-                            // Return as array to unify return type.
-                            return [node];
-                        } else {
-                            // Return as array to unify return type.
-                            return Array.from(node.querySelectorAll(selectorRule.selector));
-                        }
-                    case enums.SelectorType.XPath:
-                        // Use Chrome XPath helper for easy XPath and unified return type, 
-                        // https://developer.chrome.com/docs/devtools/console/utilities/#xpath-function
-                        return $x(selectorRule.selector, node); 
-                    case enums.SelectorType.Manual:
+        const evaluateSelector = async function (selectorRule, handle) {
+            switch (selectorRule.selectorType) {
+                case enums.SelectorType.CSS:
+                    if (selectorRule.selector == "") {
+                        return null;
+                    } else if (selectorRule.selector == ":scope") {
                         // Return as array to unify return type.
+                        return [handle];
+                    } else {
+                        // Return as array to unify return type.
+                        return await handle.$$(selectorRule.selector);
+                    }
+                case enums.SelectorType.XPath:
+                    // Use Chrome XPath helper for easy XPath and unified return type, 
+                    // https://developer.chrome.com/docs/devtools/console/utilities/#xpath-function
+                    return await handle.$x(selectorRule.selector);
+                case enums.SelectorType.Manual:
+                    // Return as array to unify return type.
+                    return [await page.evaluateHandle((selector) => {
                         let el = document.createElement("p");
-                        el.innerText = selectorRule.selector;
+                        el.innerText = selector;
 
-                        return [el];
-                }
-
-                return null;
-
-            }
-            let results = [];
-
-            for (let rule of scraperRules) {
-                let itemNodes = handleSelector(rule.items, document.body); 
-
-                for (let itemNode of itemNodes) {
-                    let labelNode = handleSelector(rule.label, itemNode)?.[0];
-                    let dishNode = handleSelector(rule.dish, itemNode)?.[0];
-                    
-                    results.push({
-                        ...rule,
-                        label: {
-                            ...rule.label,
-                            value: labelNode?.innerText
-                        },
-                        dish: {
-                            ...rule.dish,
-                            value: dishNode?.innerText
-                        }
-                    });
-                }
+                        return el;
+                    }, selectorRule.selector)];
             }
 
-            return results;
-        }, siteConfig.scraperRules, enums)).map(r => applyFilters(r));
+            return null;
+        }
+        let results = [];
+
+        for (let rule of siteConfig.scraperRules) {
+            let itemHandles = await evaluateSelector(rule.items, page);
+
+            for (let itemHandle of itemHandles) {
+                let labelHandle = (await evaluateSelector(rule.label, itemHandle))?.[0];
+                let dishHandle = (await evaluateSelector(rule.dish, itemHandle))?.[0];
+
+                results.push({
+                    ...rule,
+                    label: {
+                        ...rule.label,
+                        value: await labelHandle?.evaluate(n => n.innerText)
+                    },
+                    dish: {
+                        ...rule.dish,
+                        value: await dishHandle?.evaluate(n => n.innerText)
+                    }
+                });
+            }
+        }
+
+        let siteResults = results.map(r => applyFilters(r));
 
         globalResults.push({
             name: siteConfig.name,
