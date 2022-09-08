@@ -62,35 +62,45 @@ async function run(config) {
                         if (selectorRule.selector == "") {
                             return null;
                         } else if (selectorRule.selector == ":scope") {
-                            return node?.innerText
+                            // Return as array to unify return type.
+                            return [node];
                         } else {
-                            return node.querySelector(selectorRule.selector)?.innerText;
+                            // Return as array to unify return type.
+                            return Array.from(node.querySelectorAll(selectorRule.selector));
                         }
+                    case enums.SelectorType.XPath:
+                        // Use Chrome XPath helper for easy XPath and unified return type, 
+                        // https://developer.chrome.com/docs/devtools/console/utilities/#xpath-function
+                        return $x(selectorRule.selector, node); 
                     case enums.SelectorType.Manual:
-                        return selectorRule.selector.toString();
+                        // Return as array to unify return type.
+                        let el = document.createElement("p");
+                        el.innerText = selectorRule.selector;
+
+                        return [el];
                 }
 
                 return null;
-                
+
             }
             let results = [];
 
             for (let rule of scraperRules) {
-                let itemNodes = document.querySelectorAll(rule.items.selector);
+                let itemNodes = handleSelector(rule.items, document.body); 
 
                 for (let itemNode of itemNodes) {
-                    let labelValue = handleSelector(rule.label, itemNode);
-                    let dishValue = handleSelector(rule.dish, itemNode);
-
+                    let labelNode = handleSelector(rule.label, itemNode)?.[0];
+                    let dishNode = handleSelector(rule.dish, itemNode)?.[0];
+                    
                     results.push({
                         ...rule,
                         label: {
-                            ... rule.label,
-                            value: labelValue
+                            ...rule.label,
+                            value: labelNode?.innerText
                         },
                         dish: {
-                            ... rule.dish, 
-                            value: dishValue
+                            ...rule.dish,
+                            value: dishNode?.innerText
                         }
                     });
                 }
@@ -98,7 +108,7 @@ async function run(config) {
 
             return results;
         }, siteConfig.scraperRules, enums)).map(r => applyFilters(r));
-        
+
         globalResults.push({
             name: siteConfig.name,
             url: siteConfig.url,
