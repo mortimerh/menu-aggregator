@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@google-cloud/firestore": "^6.4.3",
     "puppeteer": "^17.1.1"
   }
 }
