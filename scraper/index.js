@@ -14,7 +14,7 @@ function applyFilters(resultItem, globalFilters) {
     if (labelFilters.length > 0) {
         resultItem.label.value = labelFilters.reduce(applyFilter, resultItem.label.value);
     }
-    
+
     const dishFilters = (resultItem.dish.filters ?? []).concat(globalFilters);
     if (dishFilters.length > 0) {
         resultItem.dish.value = dishFilters.reduce(applyFilter, resultItem.dish.value);
@@ -24,7 +24,7 @@ function applyFilters(resultItem, globalFilters) {
 }
 
 function applyFilter(value, filter) {
-    if (! value) {
+    if (!value) {
         return value;
     }
 
@@ -39,6 +39,32 @@ function applyFilter(value, filter) {
     }
 
     return value;
+}
+
+async function evaluateSelector(selectorRule, handle) {
+    switch (selectorRule.selectorType) {
+        case enums.SelectorType.CSS:
+            if (selectorRule.selector == "") {
+                return null;
+            } else if (selectorRule.selector == ":scope") {
+                // Return in array to unify return type.
+                return [handle];
+            } else {
+                return await handle.$$(selectorRule.selector);
+            }
+        case enums.SelectorType.XPath:
+            return await handle.$x(selectorRule.selector);
+        case enums.SelectorType.Manual:
+            // Return in array to unify return type.
+            return [await handle.evaluateHandle((selector) => {
+                let el = document.createElement("p");
+                el.innerText = selector;
+
+                return el;
+            }, selectorRule.selector)];
+    }
+
+    return null;
 }
 
 
@@ -59,31 +85,6 @@ async function run(config) {
         await page.goto(siteConfig.url);
         page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
 
-        const evaluateSelector = async function (selectorRule, handle) {
-            switch (selectorRule.selectorType) {
-                case enums.SelectorType.CSS:
-                    if (selectorRule.selector == "") {
-                        return null;
-                    } else if (selectorRule.selector == ":scope") {
-                        // Return in array to unify return type.
-                        return [handle];
-                    } else {
-                        return await handle.$$(selectorRule.selector);
-                    }
-                case enums.SelectorType.XPath:
-                    return await handle.$x(selectorRule.selector);
-                case enums.SelectorType.Manual:
-                    // Return in array to unify return type.
-                    return [await page.evaluateHandle((selector) => {
-                        let el = document.createElement("p");
-                        el.innerText = selector;
-
-                        return el;
-                    }, selectorRule.selector)];
-            }
-
-            return null;
-        }
         let results = [];
 
         for (let rule of siteConfig.scraperRules) {
