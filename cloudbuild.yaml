@@ -35,7 +35,7 @@ steps:
         cd infrastructure/environments/$BRANCH_NAME
         terraform init
       else
-        work_dir = $(pwd)
+        work_dir=$(pwd)
         for dir in infrastructure/environments/*/
         do 
           cd ${dir}   
@@ -61,7 +61,7 @@ steps:
         cd infrastructure/environments/$BRANCH_NAME
         terraform plan
       else
-        work_dir = $(pwd)
+        work_dir=$(pwd)
         for dir in infrastructure/environments/*/
         do 
           cd ${dir}   
