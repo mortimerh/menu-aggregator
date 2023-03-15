@@ -35,6 +35,7 @@ steps:
         cd infrastructure/environments/$BRANCH_NAME
         terraform init
       else
+        work_dir = $(pwd)
         for dir in infrastructure/environments/*/
         do 
           cd ${dir}   
@@ -45,7 +46,7 @@ steps:
           echo "******* At environment: ${env} ********"
           echo "*************************************************"
           terraform init || exit 1
-          cd ../../
+          cd $work_dir
         done
       fi 
 
@@ -60,6 +61,7 @@ steps:
         cd infrastructure/environments/$BRANCH_NAME
         terraform plan
       else
+        work_dir = $(pwd)
         for dir in infrastructure/environments/*/
         do 
           cd ${dir}   
@@ -70,7 +72,7 @@ steps:
           echo "******* At environment: ${env} ********"
           echo "*************************************************"
           terraform plan || exit 1
-          cd ../../
+          cd $work_dir
         done
       fi 
 # [END tf-plan]
