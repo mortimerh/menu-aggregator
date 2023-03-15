@@ -21,7 +21,8 @@ steps:
   - '-c'
   - | 
       echo "***********************"
-      echo "$BRANCH_NAME"
+      echo "Branch: $BRANCH_NAME"
+      echo "Working dir: $(pwd)"
       echo "***********************"
 
 - id: 'tf init'
@@ -30,11 +31,11 @@ steps:
   args: 
   - '-c'
   - |
-      if [ -d "environments/$BRANCH_NAME/" ]; then
-        cd environments/$BRANCH_NAME
+      if [ -d "infrastructure/environments/$BRANCH_NAME/" ]; then
+        cd infrastructure/environments/$BRANCH_NAME
         terraform init
       else
-        for dir in environments/*/
+        for dir in infrastructure/environments/*/
         do 
           cd ${dir}   
           env=${dir%*/}
@@ -55,11 +56,11 @@ steps:
   args: 
   - '-c'
   - | 
-      if [ -d "environments/$BRANCH_NAME/" ]; then
-        cd environments/$BRANCH_NAME
+      if [ -d "infrastructure/environments/$BRANCH_NAME/" ]; then
+        cd infrastructure/environments/$BRANCH_NAME
         terraform plan
       else
-        for dir in environments/*/
+        for dir in infrastructure/environments/*/
         do 
           cd ${dir}   
           env=${dir%*/}
@@ -81,8 +82,8 @@ steps:
   args: 
   - '-c'
   - | 
-      if [ -d "environments/$BRANCH_NAME/" ]; then
-        cd environments/$BRANCH_NAME      
+      if [ -d "infrastructure/environments/$BRANCH_NAME/" ]; then
+        cd infrastructure/environments/$BRANCH_NAME      
         terraform apply -auto-approve
       else
         echo "***************************** SKIPPING APPLYING *******************************"
