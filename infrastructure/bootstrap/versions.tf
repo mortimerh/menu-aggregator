@@ -13,18 +13,6 @@
 # limitations under the License.
 
 
-locals {
-  env = "dev"
-}
-
-provider "google" {
-  project = var.project
-  region  = var.region
-}
-
-module "storage_static_website" {
-  source   = "../../modules/storage_static_website"
-  project  = var.project
-  name     = "${var.project}-website-${local.env}"
-  location = var.region
+terraform {
+  required_version = "~> 1.4.0"
 }
