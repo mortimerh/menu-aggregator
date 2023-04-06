@@ -5,4 +5,4 @@
 #
 #########################################################################################
 project            = "dockan-lunch-dev"
-region             = "europe-north1"
+region             = "europe-west1"

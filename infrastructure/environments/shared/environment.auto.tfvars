@@ -5,7 +5,7 @@
 #
 #########################################################################################
 project            = "dockan-lunch-shared"
-region             = "europe-north1"
+region             = "europe-west1"
 tfstate_bucket     = "dockan-lunch-shared-tfstate"
 build_trigger_name = "menu-aggregator-github-trigger"
 github_owner       = "mortimerh"
