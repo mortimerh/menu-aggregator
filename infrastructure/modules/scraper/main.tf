@@ -1,5 +1,14 @@
+# Enable the IAM API
+resource "google_project_service" "iam_api_enabled" {
+  project = var.project
+  service = "iam.googleapis.com"
+}
+
 # Create a new service account to be used by the scraper
 resource "google_service_account" "lunch_scraper" {
+  depends_on = [
+    google_project_service.iam_api_enabled
+  ]
   account_id   = "lunch-scraper"
   display_name = "Lunch Scraper"
 }
@@ -32,6 +41,9 @@ resource "google_cloudfunctions_function" "lunch_menu_scraper" {
 
 # Create a new service account to be used to trigger the scraper
 resource "google_service_account" "lunch_scraper_invoker" {
+  depends_on = [
+    google_project_service.iam_api_enabled
+  ]
   account_id   = "lunch-scraper-invoker"
   display_name = "Lunch Scraper Invoker"
 }

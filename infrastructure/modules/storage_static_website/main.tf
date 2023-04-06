@@ -1,4 +1,9 @@
-# [START storage_static_website_create_bucket_tf]
+# Enable the IAM API
+resource "google_project_service" "iam_api_enabled" {
+  project = var.project
+  service = "iam.googleapis.com"
+}
+
 # Create new storage bucket in the provided region
 # with standard storage class and settings for main_page_suffix and not_found_page
 resource "google_storage_bucket" "static_website" {
@@ -13,13 +18,14 @@ resource "google_storage_bucket" "static_website" {
     not_found_page   = "index.html"
   }
 }
-# [END storage_static_website_create_bucket_tf]
 
-# # [START storage_static_website_make_bucket_public_tf]
-# # Make bucket public by granting allUsers READER access
+# Make bucket public by granting allUsers READER access
 resource "google_storage_bucket_iam_member" "member" {
-  bucket  = google_storage_bucket.static_website.id
-  role    = "roles/storage.legacyObjectReader"
-  member  = "allUsers"
+  depends_on = [
+    google_project_service.iam_api_enabled
+  ]
+  bucket = google_storage_bucket.static_website.id
+  role   = "roles/storage.legacyObjectReader"
+  member = "allUsers"
+
 }
-# # [END storage_static_website_make_bucket_public_tf]
