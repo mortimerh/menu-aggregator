@@ -75,8 +75,8 @@ steps:
       if [ -d "environments/$BRANCH_NAME/" ]; then
         cd environments/$BRANCH_NAME      
         terraform apply -auto-approve
-        echo "export SCRAPER_FUNCTION_NAME=$(terraform output -raw scraper_function_name)" >> /workspace/tf_outputs.sh
-        echo "export WEBSITE_BUCKET_NAME=$(terraform output -raw website_bucket_name)" >> /workspace/tf_outputs.sh
+        echo "SCRAPER_FUNCTION_NAME=$(terraform output -raw scraper_function_name)" >> /workspace/tf_outputs.sh
+        echo "WEBSITE_BUCKET_NAME=$(terraform output -raw website_bucket_name)" >> /workspace/tf_outputs.sh
       else
         echo "***************************** SKIPPING APPLYING *******************************"
         echo "Branch '$BRANCH_NAME' does not represent an official environment."
@@ -107,7 +107,7 @@ steps:
   - |
       if [ -d "../infrastructure/environments/$BRANCH_NAME/" ]; then
         source /workspace/tf_outputs.sh
-        gsutil -m rsync -r -d build/ gs://$WEBSITE_BUCKET_NAME/
+        gsutil -m rsync -r -d build/ gs://${WEBSITE_BUCKET_NAME}/
       else
         echo "****************************** SKIPPING DEPLOY ********************************"
         echo "Branch '$BRANCH_NAME' does not represent an official environment."
@@ -131,7 +131,7 @@ steps:
   - |
       if [ -d "../infrastructure/environments/$BRANCH_NAME/" ]; then
         source /workspace/tf_outputs.sh
-        gcloud functions deploy $SCRAPER_FUNCTION_NAME --source=.
+        gcloud functions deploy ${SCRAPER_FUNCTION_NAME} --source=.
       else
         echo "****************************** SKIPPING DEPLOY ********************************"
         echo "Branch '$BRANCH_NAME' does not represent an official environment."
