@@ -34,15 +34,17 @@ resource "google_storage_bucket" "tfstate_bucket" {
 #  NB. The GitHub connection must be setup and authenticated manually. 
 #  Follow link in error message when running this module first time.
 ##
-resource "google_project_service" "cloudbuild_api_enabled" {
-  project = var.project
-  service = "cloudbuild.googleapis.com"
+resource "google_project_service" "cloud_apis_enabled" {
+  for_each           = toset(["cloudbuild.googleapis.com", "iam.googleapis.com"])
+  project            = var.project
+  service            = each.key
+  disable_on_destroy = false
 }
 
 resource "google_project_service_identity" "build_sa" {
   provider = google-beta
-  project = var.project
-  service = "cloudbuild.googleapis.com"
+  project  = var.project
+  service  = "cloudbuild.googleapis.com"
 }
 
 resource "google_project_iam_member" "build_sa_project_editor" {
@@ -66,6 +68,6 @@ resource "google_cloudbuild_trigger" "github_trigger" {
     }
   }
 
-  depends_on = [google_project_service.cloudbuild_api_enabled]
+  depends_on = [google_project_service.cloud_apis_enabled]
 }
 ## [END Build pipeline]
