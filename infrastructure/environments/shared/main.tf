@@ -35,7 +35,7 @@ resource "google_storage_bucket" "tfstate_bucket" {
 #  Follow link in error message when running this module first time.
 ##
 resource "google_project_service" "cloud_apis_enabled" {
-  for_each           = toset(["cloudbuild.googleapis.com", "iam.googleapis.com"])
+  for_each           = toset(["cloudbuild.googleapis.com", "iam.googleapis.com", "cloudresourcemanager.googleapis.com"])
   project            = var.project
   service            = each.key
   disable_on_destroy = false
