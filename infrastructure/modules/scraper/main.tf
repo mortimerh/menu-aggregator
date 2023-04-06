@@ -9,6 +9,7 @@ resource "google_service_account" "lunch_scraper" {
   depends_on = [
     google_project_service.iam_api_enabled
   ]
+  project = var.project
   account_id   = "lunch-scraper"
   display_name = "Lunch Scraper"
 }
@@ -44,6 +45,7 @@ resource "google_service_account" "lunch_scraper_invoker" {
   depends_on = [
     google_project_service.iam_api_enabled
   ]
+  project = var.project
   account_id   = "lunch-scraper-invoker"
   display_name = "Lunch Scraper Invoker"
 }
