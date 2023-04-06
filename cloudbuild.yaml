@@ -100,7 +100,7 @@ steps:
 - id: 'Frontend: Deploy'
   dir: 'frontend'
   name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: 'sh' 
+  entrypoint: 'bash' 
   args: 
   - '-c'
   - |
@@ -122,7 +122,7 @@ steps:
 - id: 'Scraper: Deploy'
   dir: 'Scraper'
   name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: 'sh' 
+  entrypoint: 'bash' 
   args: 
   - '-c'
   - |
