@@ -14,6 +14,6 @@ module "scraper" {
   source                  = "../../modules/scraper"
   project                 = var.project
   region                  = var.region
-  function_name           = "lunch-menu-scraper-${local.env}"
-  lunch_menus_bucket_name = "${var.project}-website-${local.env}"
+  function_name           = "lunch-menu-scraper"
+  lunch_menus_bucket_name = "${var.project}-website"
 }
