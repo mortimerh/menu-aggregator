@@ -2,6 +2,7 @@
 resource "google_project_service" "iam_api_enabled" {
   project = var.project
   service = "iam.googleapis.com"
+  disable_on_destroy = false
 }
 
 # Create a new service account to be used by the scraper

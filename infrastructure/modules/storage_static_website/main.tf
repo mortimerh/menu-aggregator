@@ -2,6 +2,7 @@
 resource "google_project_service" "iam_api_enabled" {
   project = var.project
   service = "iam.googleapis.com"
+  disable_on_destroy = false
 }
 
 # Create new storage bucket in the provided region
@@ -27,5 +28,4 @@ resource "google_storage_bucket_iam_member" "member" {
   bucket = google_storage_bucket.static_website.id
   role   = "roles/storage.legacyObjectReader"
   member = "allUsers"
-
 }
