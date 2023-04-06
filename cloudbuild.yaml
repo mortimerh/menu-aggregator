@@ -1,18 +1,3 @@
-# Copyright 2019 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-
 steps:
 - id: 'branch name'
   name: 'alpine'
@@ -25,18 +10,19 @@ steps:
       echo "Working dir: $(pwd)"
       echo "***********************"
 
-- id: 'tf init'
+- id: 'Infrastructure: tf init'
   name: 'hashicorp/terraform:1.4.0'
+  dir: 'infrastructure'
   entrypoint: 'sh'
   args: 
   - '-c'
   - |
-      if [ -d "infrastructure/environments/$BRANCH_NAME/" ]; then
-        cd infrastructure/environments/$BRANCH_NAME
-        terraform init
+      if [ -d "environments/$BRANCH_NAME/" ]; then
+        cd environments/$BRANCH_NAME
+        terraform init -input=false -backend-config="bucket=$PROJECT_ID-tfstate" -backend-config="prefix=env/$BRANCH_NAME"
       else
         work_dir=$(pwd)
-        for dir in infrastructure/environments/*/
+        for dir in environments/*/
         do 
           cd ${dir}   
           env=${dir%*/}
@@ -45,24 +31,25 @@ steps:
           echo "*************** TERRAFORM INIT ******************"
           echo "******* At environment: ${env} ********"
           echo "*************************************************"
-          terraform init || exit 1
+          terraform init -input=false -backend-config="bucket=$PROJECT_ID-tfstate" -backend-config="prefix=env/$env"  || exit 1
           cd $work_dir
         done
       fi 
 
 # [START tf-plan]
-- id: 'tf plan'
+- id: 'Infrastructure: tf plan'
   name: 'hashicorp/terraform:1.4.0'
+  dir: 'infrastructure'
   entrypoint: 'sh'
   args: 
   - '-c'
   - | 
-      if [ -d "infrastructure/environments/$BRANCH_NAME/" ]; then
-        cd infrastructure/environments/$BRANCH_NAME
-        terraform plan
+      if [ -d "environments/$BRANCH_NAME/" ]; then
+        cd environments/$BRANCH_NAME
+        terraform plan -input=false
       else
         work_dir=$(pwd)
-        for dir in infrastructure/environments/*/
+        for dir in environments/*/
         do 
           cd ${dir}   
           env=${dir%*/}
@@ -78,18 +65,75 @@ steps:
 # [END tf-plan]
 
 # [START tf-apply]
-- id: 'tf apply'
+- id: 'Infrastructure: tf apply'
   name: 'hashicorp/terraform:1.4.0'
+  dir: 'infrastructure'
   entrypoint: 'sh'
   args: 
   - '-c'
   - | 
-      if [ -d "infrastructure/environments/$BRANCH_NAME/" ]; then
-        cd infrastructure/environments/$BRANCH_NAME      
+      if [ -d "environments/$BRANCH_NAME/" ]; then
+        cd environments/$BRANCH_NAME      
         terraform apply -auto-approve
+        echo "export SCRAPER_FUNCTION_NAME=$(terraform output -raw scraper_function_name)" >> /workspace/tf_outputs.sh
+        echo "export WEBSITE_BUCKET_NAME=$(terraform output -raw website_bucket_name)" >> /workspace/tf_outputs.sh
       else
         echo "***************************** SKIPPING APPLYING *******************************"
         echo "Branch '$BRANCH_NAME' does not represent an official environment."
         echo "*******************************************************************************"
       fi
 # [END tf-apply]      
+
+- id: 'Frontend: Install dependencies'
+  dir: 'frontend'
+  name: 'node'
+  entrypoint: 'npm'
+  args: 
+  - 'install'
+
+- id: 'Frontend: Build app'
+  dir: 'frontend'
+  name: 'node'
+  entrypoint: 'npm'
+  args: 
+  - 'run build'
+
+- id: 'Frontend: Deploy'
+  dir: 'frontend'
+  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'sh' 
+  args: 
+  - '-c'
+  - |
+      if [ -d "../infrastructure/environments/$BRANCH_NAME/" ]; then
+        source /workspace/tf_outputs.sh
+        gsutil -m rsync -r -d build/ gs://$WEBSITE_BUCKET_NAME/
+      else
+        echo "****************************** SKIPPING DEPLOY ********************************"
+        echo "Branch '$BRANCH_NAME' does not represent an official environment."
+        echo "*******************************************************************************"
+      fi
+  
+- id: 'Scraper: Install dependencies'
+  dir: 'scraper'
+  name: 'node'
+  entrypoint: 'npm'
+  args: 
+  - 'install'
+
+# TODO: Grab function name from tf output
+- id: 'Scraper: Deploy'
+  dir: 'Scraper'
+  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'sh' 
+  args: 
+  - '-c'
+  - |
+      if [ -d "../infrastructure/environments/$BRANCH_NAME/" ]; then
+        source /workspace/tf_outputs.sh
+        gcloud functions deploy $SCRAPER_FUNCTION_NAME --source=.
+      else
+        echo "****************************** SKIPPING DEPLOY ********************************"
+        echo "Branch '$BRANCH_NAME' does not represent an official environment."
+        echo "*******************************************************************************"
+      fi
