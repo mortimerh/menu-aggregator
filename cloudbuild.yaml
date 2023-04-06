@@ -120,7 +120,7 @@ steps:
   args: ['install']
 
 - id: 'Scraper: Deploy'
-  dir: 'Scraper'
+  dir: 'scraper'
   name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash' 
   args: 
