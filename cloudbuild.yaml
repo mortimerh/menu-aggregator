@@ -88,15 +88,13 @@ steps:
   dir: 'frontend'
   name: 'node'
   entrypoint: 'npm'
-  args: 
-  - 'install'
+  args: ['install']
 
 - id: 'Frontend: Build app'
   dir: 'frontend'
   name: 'node'
   entrypoint: 'npm'
-  args: 
-  - 'run build'
+  args: ['run', 'build']
 
 - id: 'Frontend: Deploy'
   dir: 'frontend'
@@ -118,8 +116,7 @@ steps:
   dir: 'scraper'
   name: 'node'
   entrypoint: 'npm'
-  args: 
-  - 'install'
+  args: ['install']
 
 # TODO: Grab function name from tf output
 - id: 'Scraper: Deploy'
