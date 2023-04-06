@@ -1,10 +1,10 @@
-# Enable the IAM API
-resource "google_project_service" "iam_api_enabled" {
-  project = var.project
-  service = "iam.googleapis.com"
+# Enable the neccesary Cloud APIs
+resource "google_project_service" "cloud_apis_enabled" {
+  for_each           = toset(["iam.googleapis.com",  "cloudresourcemanager.googleapis.com"])
+  project            = var.project
+  service            = each.key
   disable_on_destroy = false
 }
-
 # Create new storage bucket in the provided region
 # with standard storage class and settings for main_page_suffix and not_found_page
 resource "google_storage_bucket" "static_website" {
@@ -23,7 +23,7 @@ resource "google_storage_bucket" "static_website" {
 # Make bucket public by granting allUsers READER access
 resource "google_storage_bucket_iam_member" "member" {
   depends_on = [
-    google_project_service.iam_api_enabled
+    google_project_service.cloud_apis_enabled
   ]
   bucket = google_storage_bucket.static_website.id
   role   = "roles/storage.legacyObjectReader"

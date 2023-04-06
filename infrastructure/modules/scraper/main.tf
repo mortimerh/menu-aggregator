@@ -1,6 +1,6 @@
 # Enable the neccesary Cloud APIs
 resource "google_project_service" "cloud_apis_enabled" {
-  for_each           = toset(["iam.googleapis.com", "cloudfunctions.googleapis.com", "cloudbuild.googleapis.com", "run.googleapis.com", "artifactregistry.googleapis.com", "sourcerepo.googleapis.com", "cloudscheduler.googleapis.com"])
+  for_each           = toset(["iam.googleapis.com", "cloudfunctions.googleapis.com", "cloudbuild.googleapis.com", "run.googleapis.com", "artifactregistry.googleapis.com", "sourcerepo.googleapis.com", "cloudscheduler.googleapis.com", "cloudresourcemanager.googleapis.com"])
   project            = var.project
   service            = each.key
   disable_on_destroy = false
