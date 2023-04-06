@@ -1,3 +1,3 @@
-output "function_name" {
-    value = google_cloudfunctions_function.lunch_menu_scraper.name
+output "function_id" {
+    value = google_cloudfunctions_function.lunch_menu_scraper.id
 }
