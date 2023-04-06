@@ -72,6 +72,7 @@ steps:
   args: 
   - '-c'
   - | 
+      set -e
       if [ -d "environments/$BRANCH_NAME/" ]; then
         cd environments/$BRANCH_NAME      
         terraform apply -auto-approve
@@ -118,7 +119,6 @@ steps:
   entrypoint: 'npm'
   args: ['install']
 
-# TODO: Grab function name from tf output
 - id: 'Scraper: Deploy'
   dir: 'Scraper'
   name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
