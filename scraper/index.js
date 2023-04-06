@@ -76,7 +76,8 @@ function menuItemToString(menuItem) {
     }
 }
 
-async function run(config) {
+
+async function scrapeSites(config) {
     const browser = await puppeteer.launch();
     let globalResults = [];
 
@@ -121,8 +122,8 @@ async function run(config) {
     return globalResults;
 }
 
-exports.run = (req, res) => {
-    var results = scrapeSites(myConfig);
+exports.run = async (req, res) => {
+    var results = await scrapeSites(myConfig);
 
     res.status(200).json(results); 
 }
