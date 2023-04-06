@@ -118,7 +118,11 @@ async function run(config) {
     }
     browser.close();
 
-    console.log(globalResults);
+    return globalResults;
 }
 
-run(myConfig);
+exports.run = (req, res) => {
+    var results = scrapeSites(myConfig);
+
+    res.status(200).json(results); 
+}
