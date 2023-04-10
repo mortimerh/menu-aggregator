@@ -56,7 +56,7 @@ resource "google_cloudfunctions_function" "lunch_menu_scraper" {
   description = "Scrapes lunch menus of local restaurants."
   region      = var.region
 
-  runtime             = "nodejs18"
+  runtime             = "nodejs16"
   available_memory_mb = var.memory
   timeout             = var.timeout
   entry_point         = "run"
