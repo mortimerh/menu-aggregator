@@ -11,12 +11,12 @@ variable "function_name" {
 }
 
 variable "schedule" {
-  description = "The schedule in cron format. This example runs every 10 minutes between 05.00 and 12.00 Stockholm time."
-  default = "0 5-11/1 * * *"
+  description = "The schedule in cron format. The default runs every hour between 06.00 and 12.00."
+  default = "0 6-11/1 * * *"
 }
 
 variable "timezone" {
-  description = "The timezone to use for the schedule."
+  description = "The timezone to use for the schedule. The default is Stockholm time."
   default = "Europe/Stockholm"
 }
 
