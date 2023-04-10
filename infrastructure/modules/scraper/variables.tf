@@ -22,7 +22,7 @@ variable "timezone" {
 
 variable "memory" {
   description = "The amount of memory to allocate for the Cloud Function."
-  default = 256
+  default = 512
 }
 
 variable "timeout" {
