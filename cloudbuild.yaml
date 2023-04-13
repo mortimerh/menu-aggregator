@@ -128,7 +128,7 @@ steps:
   - |
       if [ -d "../infrastructure/environments/$BRANCH_NAME/" ]; then
         source /workspace/tf_outputs.sh
-        gcloud functions deploy $scraper_function_id --source=.
+        gcloud functions deploy $scraper_function_id --source=. --set-env-vars BUCKET_NAME=$website_bucket_name
       else
         echo "****************************** SKIPPING DEPLOY ********************************"
         echo "Branch '$BRANCH_NAME' does not represent an official environment."

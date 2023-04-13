@@ -5,6 +5,8 @@ const restaurangSpill = require('./restaurants/restaurang-spill');
 const zenThai = require('./restaurants/zen-thai');
 
 module.exports = {
+    bucketName: process.env.BUCKET_NAME,
+    fileName: "data/menus.json",
     global: {
         filters: [
             {

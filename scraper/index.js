@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 const re2 = RegExp; // @fixme actually use re2
+const { Storage } = require('@google-cloud/storage');
 
 const myConfig = require('./config');
 const enums = require('./common/enums');
@@ -76,9 +77,28 @@ function menuItemToString(menuItem) {
     }
 }
 
+async function save(bucketName, fileName, data) {
+    // Creates a client
+    const storage = new Storage();
+
+    // Convert the data to a JSON string
+    const dataJson = JSON.stringify(data);
+
+    // Define the file options
+    const fileOptions = {
+        contentType: 'application/json',
+        gzip: true
+    };
+
+    // Upload the file to the bucket
+    await storage.bucket(bucketName).file(fileName).save(dataJson, fileOptions);
+    console.info(`File ${fileName} uploaded to ${bucketName}.`);
+}
 
 async function scrapeSites(config) {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+        headless: true
+    });
     let globalResults = [];
 
     for (let siteConfig of config.sites.filter(s => s.active)) {
@@ -124,6 +144,8 @@ async function scrapeSites(config) {
 
 exports.run = async (req, res) => {
     var results = await scrapeSites(myConfig);
+    await save(myConfig.bucketName, myConfig.fileName, results);
 
+    
     res.status(200).json(results); 
 }
