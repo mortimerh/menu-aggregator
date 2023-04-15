@@ -32,9 +32,12 @@ class Tabs extends React.Component {
 
     render() {
         return (
-            <div className="tabs">
-                <ul>{this.props.tabs.map((tab, i) => this.renderTabItem(tab, i))}</ul>
-            </div>
+            <>
+                <div className="tabs">
+                    <ul>{this.props.tabs.map((tab, i) => this.renderTabItem(tab, i))}</ul>
+                </div>
+                {this.props.children[this.state.activeTabIndex]}
+            </>
         );
 
 
