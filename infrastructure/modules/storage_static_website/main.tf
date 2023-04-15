@@ -20,9 +20,8 @@ resource "google_storage_bucket" "static_website" {
   }
 
   cors {
-    origin          = ["*"]
+    origin          = "*"
     method          = ["GET", "HEAD"]
-    response_header = ["*"]
     max_age_seconds = 600
   }
 }
