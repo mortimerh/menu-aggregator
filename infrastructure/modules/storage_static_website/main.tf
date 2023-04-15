@@ -18,6 +18,13 @@ resource "google_storage_bucket" "static_website" {
     main_page_suffix = "index.html"
     not_found_page   = "index.html"
   }
+
+  cors {
+    origin          = ["*"]
+    method          = ["GET", "HEAD"]
+    response_header = ["*"]
+    max_age_seconds = 600
+  }
 }
 
 # Make bucket public by granting allUsers READER access
