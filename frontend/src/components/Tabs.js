@@ -1,46 +1,28 @@
-import React from "react";
+import { useState } from 'react';
 
-class Tabs extends React.Component {
-    constructor(props) {
-        super(props);
+export default function Tabs({ initialTabIndex, children }) {
+    const [activeTabIndex, setActiveTabIndex] = useState(initialTabIndex || 0);
 
-        this.state = {
-            activeTabIndex: this.props.initialTabIndex || 0
-        }
-
-        this.handleTabClick = this.handleTabClick.bind(this);
+    function handleTabClick(tabIndex) {
+        setActiveTabIndex(tabIndex);
     }
 
-    handleTabClick(tabIndex) {
-        this.setState({
-            activeTabIndex: tabIndex
-        });
-
-        // if (this.props.onTabClick) {
-        //     this.props.onTabClick(tabIndex);
-        // }
-    }
-
-    renderTabItem(title, index) {
-        const isActive = (index === this.state.activeTabIndex);
+    function renderTabItem(title, index) {
+        const isActive = (index === activeTabIndex);
         return (
             <li className={isActive ? "is-active" : ""} key={title}>
-                <a href="#" onClick={() => this.handleTabClick(index)}>{title}</a>
+                <a href="#" onClick={() => handleTabClick(index)}>{title}</a>
             </li>
         )
     }
 
-    render() {
-        return (
-            <>
-                <div className="tabs">
-                    <ul>{this.props.tabs.map((tab, i) => this.renderTabItem(tab, i))}</ul>
-                </div>
-                {this.props.children[this.state.activeTabIndex]}
-            </>
-        );
 
-
-    }
+    return (
+        <>
+            <div className="tabs">
+                <ul>{children.map((child, i) => renderTabItem(child.props.label, i))}</ul>
+            </div>
+            {children[activeTabIndex]}
+        </>
+    );
 }
-export default Tabs;
