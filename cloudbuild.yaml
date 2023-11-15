@@ -117,7 +117,7 @@ steps:
   - |
       if [ -d "../infrastructure/environments/$BRANCH_NAME/" ]; then
         source /workspace/tf_outputs.sh
-        gsutil -m rsync -r -d build/ gs://$website_bucket_name/ -y "^data/"
+        gsutil -m rsync -r -d -y "^data/" build/ gs://$website_bucket_name/ 
       else
         echo "****************************** SKIPPING DEPLOY ********************************"
         echo "Branch '$BRANCH_NAME' does not represent an official environment."
