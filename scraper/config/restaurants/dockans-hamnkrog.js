@@ -2,7 +2,7 @@ const enums = require("../../common/enums");
 
 module.exports = {
     name: "Dockans Hamnkrog",
-    active: true,
+    active: false,
     url: "https://dockanshamnkrog.se/lunchmeny/",
     scraperRules: [
         {
