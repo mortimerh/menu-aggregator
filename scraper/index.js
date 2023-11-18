@@ -102,31 +102,39 @@ async function scrapeSites(config) {
     let globalResults = [];
 
     for (let siteConfig of config.sites.filter(s => s.active)) {
-        const page = await browser.newPage();
-        await page.goto(siteConfig.url);
-        page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
-
         let results = [];
+        let success = false;
 
-        for (let rule of siteConfig.scraperRules) {
-            let itemHandles = await evaluateSelector(rule.items, page);
+        try {
+            const page = await browser.newPage();
+            await page.goto(siteConfig.url);
+            page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
 
-            for (let itemHandle of itemHandles) {
-                let labelHandle = (await evaluateSelector(rule.label, itemHandle))?.[0];
-                let dishHandle = (await evaluateSelector(rule.dish, itemHandle))?.[0];
 
-                results.push({
-                    ...rule,
-                    label: {
-                        ...rule.label,
-                        value: await labelHandle?.evaluate(n => n.textContent)
-                    },
-                    dish: {
-                        ...rule.dish,
-                        value: await dishHandle?.evaluate(n => n.textContent)
-                    }
-                });
+            for (let rule of siteConfig.scraperRules) {
+                let itemHandles = await evaluateSelector(rule.items, page);
+
+                for (let itemHandle of itemHandles) {
+                    let labelHandle = (await evaluateSelector(rule.label, itemHandle))?.[0];
+                    let dishHandle = (await evaluateSelector(rule.dish, itemHandle))?.[0];
+
+                    results.push({
+                        ...rule,
+                        label: {
+                            ...rule.label,
+                            value: await labelHandle?.evaluate(n => n.textContent)
+                        },
+                        dish: {
+                            ...rule.dish,
+                            value: await dishHandle?.evaluate(n => n.textContent)
+                        }
+                    });
+                }
             }
+            success = true;
+        } catch (error) {
+            console.error("Failed to scrape %s.", siteConfig.name);
+            console.error(error);
         }
 
         let siteResults = results.map(r => applyFilters(r, config.global?.filters));
@@ -134,7 +142,8 @@ async function scrapeSites(config) {
         globalResults.push({
             name: siteConfig.name,
             url: siteConfig.url,
-            results: siteResults.map(menuItemToString)
+            results: siteResults.map(menuItemToString),
+            success: success
         });
     }
     browser.close();
@@ -146,6 +155,6 @@ exports.run = async (req, res) => {
     var results = await scrapeSites(myConfig);
     await save(myConfig.bucketName, myConfig.fileName, results);
 
-    
-    res.status(200).json(results); 
+
+    res.status(200).json(results);
 }
