@@ -18,7 +18,7 @@ resource "google_service_account" "lunch_scraper" {
 # Grant the service account the necessary permissions to write to the Google Cloud Storage bucket
 resource "google_storage_bucket_iam_member" "bucket_writer" {
   bucket = var.lunch_menus_bucket_name
-  role   = "roles/storage.objectCreator"
+  role   = "roles/storage.objectUser"
   member = "serviceAccount:${google_service_account.lunch_scraper.email}"
 }
 
