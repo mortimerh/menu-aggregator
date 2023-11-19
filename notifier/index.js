@@ -1,9 +1,6 @@
 const { Storage } = require('@google-cloud/storage');
 const fetch = require('node-fetch');
 const myConfig = require('./config');
-const { run } = require('../scraper');
-const { default: RestaurantMenu } = require('../frontend/src/components/RestaurantMenu');
-const { reduceEachTrailingCommentRange } = require('typescript');
 
 async function read(bucketName, fileName) {
     try {
@@ -89,4 +86,3 @@ exports.run = async (req, res) => {
 
     res.status(200).text("Notications sent.");
 }
-exports.run();
