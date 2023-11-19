@@ -5,3 +5,7 @@ output "website_bucket_name" {
 output "scraper_function_id" {
     value = module.scraper.function_id
 }
+
+output "notifier_function_id" {
+    value = module.notifier.function_id
+}

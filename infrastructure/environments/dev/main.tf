@@ -17,3 +17,11 @@ module "scraper" {
   function_name           = "lunch-menu-scraper"
   lunch_menus_bucket_name = "${var.project}-website"
 }
+
+module "notifier" {
+  source                  = "../../modules/notifier"
+  project                 = var.project
+  region                  = var.region
+  function_name           = "lunch-menu-notifier"
+  lunch_menus_bucket_name = "${var.project}-website"
+}
