@@ -29,7 +29,7 @@ async function notifyTeams(url, menus) {
             headers: { 'Content-Type': 'application/json' }
         });
         console.info("Notified teams at %s. Status code: %s", url, response.status);
-        console.info(response);
+        console.info(await response.text());
 
         return true;
     } catch (error) {
