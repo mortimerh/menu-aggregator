@@ -68,7 +68,7 @@ function createTeamsCard(menus) {
 exports.run = async (req, res) => {
     if (! myConfig.teamsWebhookUrl) {
         console.info("No notification reciever setup. Exiting.");
-        res.status(200).text("No one to notify.");
+        res.status(200).send("No one to notify.");
         
         return;
     }
@@ -76,7 +76,7 @@ exports.run = async (req, res) => {
     const menus = await read(myConfig.bucketName, myConfig.fileName);
     if (menus.length == 0) {
         console.info("No menus available. Exiting.");
-        res.status(200).text("Nothing to notify.");
+        res.status(200).send("Nothing to notify.");
         
         return;
     }
@@ -84,5 +84,5 @@ exports.run = async (req, res) => {
     let notificationResult = await notifyTeams(myConfig.teamsWebhookUrl, menus);
     console.info("Teams notified with success: %s", notificationResult);
 
-    res.status(200).text("Notications sent.");
+    res.status(200).send("Notications sent.");
 }
