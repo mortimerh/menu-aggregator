@@ -23,13 +23,15 @@ async function read(bucketName, fileName) {
 async function notifyTeams(url, menus) {
     try {
         const teamsCard = createTeamsCard(menus);
+        console.debug("Created teams card:");
+        console.debug(teamsCard);
         const response = await fetch(url, {
             method: 'POST',
             body: JSON.stringify(teamsCard),
             headers: { 'Content-Type': 'application/json' }
         });
         console.info("Notified teams at %s. Status code: %s", url, response.status);
-        console.info(await response.text());
+        console.debug(await response.json());
 
         return true;
     } catch (error) {
