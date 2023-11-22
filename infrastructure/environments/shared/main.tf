@@ -61,6 +61,13 @@ resource "google_project_iam_member" "build_sa_gfc_iam_editor" {
   role    = "roles/cloudfunctions.admin"
   member  = "serviceAccount:${google_project_service_identity.build_sa.email}"
 }
+resource "google_project_iam_member" "build_sa_secrets_iam_editor" {
+  for_each = toset(concat([var.project], values(var.environments_projects)))
+
+  project = each.key
+  role    = "roles/secretmanager.admin"
+  member  = "serviceAccount:${google_project_service_identity.build_sa.email}"
+}
 
 resource "google_cloudbuild_trigger" "github_trigger" {
   name          = var.build_trigger_name
