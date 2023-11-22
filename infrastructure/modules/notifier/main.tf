@@ -88,7 +88,7 @@ resource "google_cloudfunctions_function" "lunch_menu_notifier" {
 
   secret_environment_variables {
     key     = "SECRET_CONFIG"
-    secret  = google_secret_manager_secret.lunch_notifier_secret.id
+    secret  = google_secret_manager_secret.lunch_notifier_secret.secret_id
     version = "latest"
   }
 }
