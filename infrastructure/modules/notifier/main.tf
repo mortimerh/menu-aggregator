@@ -1,6 +1,6 @@
 # Enable the neccesary Cloud APIs
 resource "google_project_service" "cloud_apis_enabled" {
-  for_each           = toset(["iam.googleapis.com", "cloudfunctions.googleapis.com", "cloudbuild.googleapis.com", "run.googleapis.com", "artifactregistry.googleapis.com", "sourcerepo.googleapis.com", "cloudscheduler.googleapis.com", "cloudresourcemanager.googleapis.com"])
+  for_each           = toset(["iam.googleapis.com", "cloudfunctions.googleapis.com", "cloudbuild.googleapis.com", "run.googleapis.com", "artifactregistry.googleapis.com", "sourcerepo.googleapis.com", "cloudscheduler.googleapis.com", "cloudresourcemanager.googleapis.com", "secretmanager.googleapis.com"])
   project            = var.project
   service            = each.key
   disable_on_destroy = false
@@ -20,6 +20,25 @@ resource "google_storage_bucket_iam_member" "bucket_writer" {
   bucket = var.lunch_menus_bucket_name
   role   = "roles/storage.objectViewer"
   member = "serviceAccount:${google_service_account.lunch_notifier.email}"
+}
+
+# Create a secret to hold sensitive config for the notifier, e.g. webhooks urls
+resource "google_secret_manager_secret" "lunch_notifier_secret" {
+  depends_on = [
+    google_project_service.cloud_apis_enabled
+  ]
+
+  secret_id = "${var.function_name}-config"
+
+  replication {
+    automatic = true
+  }
+}
+# Grant the service account access to read the secret
+resource "google_secret_manager_secret_iam_member" "secret_accessor" {
+  secret_id = google_secret_manager_secret.lunch_notifier_secret.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.lunch_notifier.email}"
 }
 
 # Create a bucket to store source for Cloud Function and upload a placeholder .zip
@@ -66,6 +85,12 @@ resource "google_cloudfunctions_function" "lunch_menu_notifier" {
 
   source_archive_bucket = google_storage_bucket.lunch_notifier_source_bucket.name
   source_archive_object = google_storage_bucket_object.archive.name
+
+  secret_environment_variables {
+    key     = "SECRET_CONFIG"
+    secret  = google_secret_manager_secret.lunch_notifier_secret.id
+    version = "latest"
+  }
 }
 
 # Create a new service account to be used to trigger the notifier
