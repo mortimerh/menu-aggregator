@@ -142,8 +142,10 @@ async function scrapeSites(config) {
         globalResults.push({
             name: siteConfig.name,
             url: siteConfig.url,
-            results: siteResults.map(transformMenuItemResult),
-            success: success
+            menu: siteResults.map(transformMenuItemResult),
+            success: success,
+            lastScraped: (new Date()).toISOString(),
+            lastChanged: "unknown"
         });
     }
     browser.close();
