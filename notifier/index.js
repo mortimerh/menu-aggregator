@@ -42,36 +42,70 @@ async function notifyTeams(url, menus) {
     }
 }
 
-function createTeamsCard(menus) {
+function createTeamsCard(restaurantMenus) {
     let card = {
         "type": "message",
         "attachments": [
             {
-                "contentType": "application/vnd.microsoft.teams.card.o365connector",
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "version": "1.5",
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": null,
                 "content": {
-                    "@type": "MessageCard",
-                    "@context": "http://schema.org/extensions",
-                    "summary": "Today's lunch options in Dockan, Malmö-",
-                    "title": "Today's lunch",
-                    "sections": menus.map(menu => ({
-                        title: menu.name,
-                        facts: {
-                            "title": "Details",
-                            "text": "`" + JSON.stringify(menu.results) + "`"
+                    "type": "AdaptiveCard",
+                    "body": [
+                        {
+                            "type": "TextBlock",
+                            "size": "Medium",
+                            "weight": "Bolder",
+                            "text": "Dagens lunch " + (new Date()).toLocaleDateString("sv-SE")
+                        },
+                        ...restaurantMenus.map(restaurant => ({
+                            "type": "Container",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "weight": "Bolder",
+                                    "text": restaurant.name,
+                                    "wrap": true
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "spacing": "None",
+                                    "text": "Uppdaterades " + restaurant.lastChanged,
+                                    "isSubtle": true,
+                                    "wrap": true
+                                },
+                                {
+                                    "type": "FactSet",
+                                    "facts": restaurant.menu.map(menuItem => ({
+                                        "title": menuItem.label,
+                                        "value": menuItem.dish
+                                    }))
+                                }
+                            ]
+                        }))
+                    ],
+                    "actions": [
+                        {
+                            "type": "Action.OpenUrl",
+                            "title": "View on web",
+                            "url": myConfig.websiteUrl
                         }
-                    }))
+                    ]
                 }
-            }]
+            }
+        ]
     };
 
     return card;
 }
 
 exports.run = async (req, res) => {
-    if (! myConfig.teamsWebhookUrl) {
+    if (!myConfig.teamsWebhookUrl) {
         console.info("No notification reciever setup. Exiting.");
         res.status(200).send("No one to notify.");
-        
+
         return;
     }
 
@@ -79,7 +113,7 @@ exports.run = async (req, res) => {
     if (menus.length == 0) {
         console.info("No menus available. Exiting.");
         res.status(200).send("Nothing to notify.");
-        
+
         return;
     }
 
