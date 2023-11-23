@@ -69,12 +69,13 @@ async function evaluateSelector(selectorRule, handle) {
 }
 
 
-function menuItemToString(menuItem) {
-    if (menuItem.type == enums.ScraperRuleType.Daily && menuItem.day) {
-        return `${Object.keys(enums.Days)[menuItem.day - 1]} - ${menuItem.label.value} - ${menuItem.dish.value}`;
-    } else {
-        return `${menuItem.label.value} - ${menuItem.dish.value}`;
-    }
+function transformMenuItemResult(menuItem) {
+    return {
+        type: menuItem.type,
+        qualifier: (menuItem.type == enums.ScraperRuleType.Daily ? menuItem.day : null),
+        label: menuItem.label.value,
+        dish: menuItem.dish.value
+    };
 }
 
 async function save(bucketName, fileName, data) {
@@ -138,11 +139,10 @@ async function scrapeSites(config) {
         }
 
         let siteResults = results.map(r => applyFilters(r, config.global?.filters));
-
         globalResults.push({
             name: siteConfig.name,
             url: siteConfig.url,
-            results: siteResults.map(menuItemToString),
+            results: siteResults.map(transformMenuItemResult),
             success: success
         });
     }
