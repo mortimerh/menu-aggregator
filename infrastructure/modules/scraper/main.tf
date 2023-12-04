@@ -66,6 +66,10 @@ resource "google_cloudfunctions_function" "lunch_menu_scraper" {
 
   source_archive_bucket = google_storage_bucket.lunch_scraper_source_bucket.name
   source_archive_object = google_storage_bucket_object.archive.name
+
+  environment_variables = {
+    "BUCKET_NAME" = var.lunch_menus_bucket_name
+  }
 }
 
 # Create a new service account to be used to trigger the scraper

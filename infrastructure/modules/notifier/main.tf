@@ -86,6 +86,10 @@ resource "google_cloudfunctions_function" "lunch_menu_notifier" {
   source_archive_bucket = google_storage_bucket.lunch_notifier_source_bucket.name
   source_archive_object = google_storage_bucket_object.archive.name
 
+  environment_variables = {
+    "BUCKET_NAME" = var.lunch_menus_bucket_name
+  }
+
   secret_environment_variables {
     key     = "SECRET_CONFIG"
     secret  = google_secret_manager_secret.lunch_notifier_secret.secret_id
