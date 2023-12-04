@@ -1,14 +1,17 @@
-const { Storage } = require('@google-cloud/storage');
-const fetch = require('node-fetch');
-const myConfig = require('./config');
+import { Storage } from "@google-cloud/storage";
+import fetch from "node-fetch";
+import { RestaurantMenu } from "../shared/interfaces";
+import { DayOfWeek } from "../shared/enums";
+import { getDailyMenu } from "../shared/helpers";
+import { config as myConfig } from "./config";
 
-async function read(bucketName, fileName) {
+async function read(bucketName: string, fileName: string) {
     try {
         // Creates a client
         const storage = new Storage();
 
         const fileContents = await storage.bucket(bucketName).file(fileName).download();
-        const data = JSON.parse(fileContents);
+        const data = JSON.parse(fileContents.toString());
         console.info("Fetched menus data from %s/%s", bucketName, fileName);
 
         return data;
@@ -20,7 +23,7 @@ async function read(bucketName, fileName) {
     return null; // @fixme should return null on failure, or maybe raise the exception to run()
 }
 
-async function notifyTeams(url, menus) {
+async function notifyTeams(url: string, menus: RestaurantMenu[]) {
     try {
         const teamsCard = createTeamsCard(menus);
         console.debug("Created teams card:");
@@ -42,7 +45,9 @@ async function notifyTeams(url, menus) {
     }
 }
 
-function createTeamsCard(restaurantMenus) {
+function createTeamsCard(restaurantMenus: RestaurantMenu[]) {
+    const now = new Date();
+    const todayWeekday = now.getDay() as DayOfWeek;
     let card = {
         "type": "message",
         "attachments": [
@@ -58,7 +63,7 @@ function createTeamsCard(restaurantMenus) {
                             "type": "TextBlock",
                             "size": "Medium",
                             "weight": "Bolder",
-                            "text": "Dagens lunch " + (new Date()).toLocaleDateString("sv-SE")
+                            "text": "Dagens lunch " + now.toLocaleDateString("sv-SE")
                         },
                         ...restaurantMenus.map(restaurant => ({
                             "type": "Container",
@@ -78,7 +83,7 @@ function createTeamsCard(restaurantMenus) {
                                 },
                                 {
                                     "type": "FactSet",
-                                    "facts": restaurant.menu.map(menuItem => ({
+                                    "facts": getDailyMenu(restaurant.menu, todayWeekday).map(menuItem => ({
                                         "title": menuItem.label,
                                         "value": menuItem.dish
                                     }))
@@ -101,7 +106,7 @@ function createTeamsCard(restaurantMenus) {
     return card;
 }
 
-exports.run = async (req, res) => {
+exports.run = async (req: any, res: any) => {
     if (!myConfig.teamsWebhookUrl) {
         console.info("No notification reciever setup. Exiting.");
         res.status(200).send("No one to notify.");
