@@ -1,16 +1,19 @@
-const enums = require('../common/enums');
+import { FilterType } from "../../shared/enums";
+import { ScraperConfig } from "./interfaces";
+
 const dockansHamnkrog = require('./restaurants/dockans-hamnkrog');
 const restaurangP2 = require('./restaurants/restaurang-p2');
 const restaurangSpill = require('./restaurants/restaurang-spill');
 const zenThai = require('./restaurants/zen-thai');
 
-module.exports = {
-    bucketName: process.env.BUCKET_NAME,
+
+export const config: ScraperConfig = {
+    bucketName: process.env.BUCKET_NAME || "",
     fileName: "data/menus.json",
     global: {
         filters: [
             {
-                type: enums.FilterType.Trim
+                type: FilterType.Trim
             }
         ]
     },
@@ -21,3 +24,4 @@ module.exports = {
         zenThai
     ]
 };
+

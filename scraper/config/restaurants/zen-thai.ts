@@ -1,4 +1,4 @@
-const enums = require("../../common/enums");
+import { SelectorType, MenuItemType } from "../../../shared/enums";
 
 module.exports = {
     name: "Zen Thai",
@@ -6,18 +6,18 @@ module.exports = {
     url: "http://www.zenthai.se/",
     scraperRules: [
         {
-            type: enums.ScraperRuleType.Weekly,
+            type: MenuItemType.Weekly,
             items: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: "#page-zones__main-widgets__content > .bk-content-text > p",
             },
             label: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: "strong",
             },
-            
+
             dish: {
-                selectorType: enums.SelectorType.XPath,
+                selectorType: SelectorType.XPath,
                 selector: "./strong/following::br/following::text()"
             }
         }

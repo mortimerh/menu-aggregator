@@ -1,4 +1,4 @@
-const enums = require("../../common/enums");
+import { SelectorType, MenuItemType, DayOfWeek } from "../../../shared/enums";
 
 module.exports = {
     name: "p2",
@@ -6,85 +6,85 @@ module.exports = {
     url: "https://www.restaurangp2.se/lunch",
     scraperRules: [
         {
-            type: enums.ScraperRuleType.Daily,
-            day: enums.Days.Monday,
+            type: MenuItemType.Daily,
+            day: DayOfWeek.Monday,
             items: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: "#monday tr"
             },
             label: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: ".course_type > p"
             },
             dish: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: ".course_description > p",
             }
         },
         {
-            type: enums.ScraperRuleType.Daily,
-            day: enums.Days.Tuesday,
+            type: MenuItemType.Daily,
+            day: DayOfWeek.Tuesday,
             items: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: "#tuesday tr"
             },
             label: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: ".course_type > p"
             },
             dish: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: ".course_description > p"
             }
         },
         {
 
-            type: enums.ScraperRuleType.Daily,
-            day: enums.Days.Wednesday,
+            type: MenuItemType.Daily,
+            day: DayOfWeek.Wednesday,
             items: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: "#wednesday tr"
             },
             label: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: ".course_type > p"
             },
             dish: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: ".course_description > p"
             },
         },
         {
 
-            type: enums.ScraperRuleType.Daily,
-            day: enums.Days.Thursday,
+            type: MenuItemType.Daily,
+            day: DayOfWeek.Thursday,
             items: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: "#thursday tr"
             },
             label: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: ".course_type > p"
             },
             dish: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: ".course_description > p"
             },
         },
         {
 
-            type: enums.ScraperRuleType.Daily,
-            day: enums.Days.Friday,
+            type: MenuItemType.Daily,
+            day: DayOfWeek.Friday,
             items: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: "#friday tr"
             },
             label: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: ".course_type > p"
             },
             dish: {
-                selectorType: enums.SelectorType.CSS,
+                selectorType: SelectorType.CSS,
                 selector: ".course_description > p"
             },
         },

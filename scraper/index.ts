@@ -1,14 +1,17 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs');
-const path = require('path');
+import puppeteer from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
 const re2 = RegExp; // @fixme actually use re2
-const { Storage } = require('@google-cloud/storage');
+import { Storage } from '@google-cloud/storage';
 
-const myConfig = require('./config');
-const enums = require('./common/enums');
+import { config } from './config/index';
+import { FilterType, SelectorType, MenuItemType } from '../shared/enums'
+import { MenuItem } from '../shared/interfaces'
+import { ScraperFilterConfig, ScraperRuleConfig, ScraperConfig } from './config/interfaces';
 
+interface ResultItem { label: { filters: any; value: any; }; dish: { filters: any; value: any; }; }
 
-function applyFilters(resultItem, globalFilters) {
+function applyFilters(resultItem: ResultItem, globalFilters: ScraperFilterConfig[]) {
     globalFilters = globalFilters ?? [];
 
     const labelFilters = (resultItem.label.filters ?? []).concat(globalFilters);
@@ -24,15 +27,20 @@ function applyFilters(resultItem, globalFilters) {
     return resultItem;
 }
 
-function applyFilter(value, filter) {
+function applyFilter(value: string, filter: ScraperFilterConfig) {
     if (!value) {
         return value;
     }
 
     switch (filter.type) {
-        case enums.FilterType.Trim:
+        case FilterType.Trim:
             return value.trim();
-        case enums.FilterType.RegExp:
+        case FilterType.RegExp:
+            if (!filter.argument) {
+                console.error("Missing argument for regexp filter. Returning value: " + value);
+                return value;
+            }
+
             let re = new re2(filter.argument);
             let matches = value.match(re);
 
@@ -42,43 +50,45 @@ function applyFilter(value, filter) {
     return value;
 }
 
-async function evaluateSelector(selectorRule, handle) {
+async function evaluateSelector(selectorRule: ScraperRuleConfig, handle: puppeteer.ElementHandle<Node>): Promise<puppeteer.ElementHandle<Node>[]> {
     switch (selectorRule.selectorType) {
-        case enums.SelectorType.CSS:
+        case SelectorType.CSS:
             if (selectorRule.selector == "") {
-                return null;
+                console.warn("Missing CSS selector value. Returning empty array. ");
+                return [];
             } else if (selectorRule.selector == ":scope") {
                 // Return in array to unify return type.
                 return [handle];
             } else {
                 return await handle.$$(selectorRule.selector);
             }
-        case enums.SelectorType.XPath:
+        case SelectorType.XPath:
             return await handle.$x(selectorRule.selector);
-        case enums.SelectorType.Manual:
-            // Return in array to unify return type.
-            return [await handle.evaluateHandle((selector) => {
-                let el = document.createElement("p");
-                el.innerText = selector;
+        case SelectorType.Manual:
+            // Create handle and return in array to unify return type.
+            return [await handle.evaluateHandle((element, selector) => {
+                let p = document.createElement("p");
+                p.innerText = selector;
 
-                return el;
-            }, selectorRule.selector)];
+                return p;
+            }, selectorRule.selector as string)];
+        default:
+            console.warn("No handling defined for SelectorType: " + selectorRule.selectorType + "Returning empty array. ");
+            return [];
     }
-
-    return null;
 }
 
 
-function transformMenuItemResult(menuItem) {
+function transformMenuItemResult(menuItem: any): MenuItem {
     return {
         type: menuItem.type,
-        qualifier: (menuItem.type == enums.ScraperRuleType.Daily ? menuItem.day : null),
+        qualifier: (menuItem.type == MenuItemType.Daily ? menuItem.day : null),
         label: menuItem.label.value,
         dish: menuItem.dish.value
     };
 }
 
-async function save(bucketName, fileName, data) {
+async function save(bucketName: string, fileName: string, data: any) {
     // Creates a client
     const storage = new Storage();
 
@@ -96,7 +106,7 @@ async function save(bucketName, fileName, data) {
     console.info(`File ${fileName} uploaded to ${bucketName}.`);
 }
 
-async function scrapeSites(config) {
+async function scrapeSites(config: ScraperConfig) {
     const browser = await puppeteer.launch({
         headless: true
     });
@@ -110,10 +120,15 @@ async function scrapeSites(config) {
             const page = await browser.newPage();
             await page.goto(siteConfig.url);
             page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
+            const body = await page.$("body");
 
+            if (! body) {
+                console.error("Unable to access page body element.");
+                continue;
+            }
 
             for (let rule of siteConfig.scraperRules) {
-                let itemHandles = await evaluateSelector(rule.items, page);
+                let itemHandles = await evaluateSelector(rule.items, body);
 
                 for (let itemHandle of itemHandles) {
                     let labelHandle = (await evaluateSelector(rule.label, itemHandle))?.[0];
@@ -153,9 +168,9 @@ async function scrapeSites(config) {
     return globalResults;
 }
 
-exports.run = async (req, res) => {
-    var results = await scrapeSites(myConfig);
-    await save(myConfig.bucketName, myConfig.fileName, results);
+exports.run = async (req: any, res: any) => {
+    var results = await scrapeSites(config);
+    await save(config.bucketName, config.fileName, results);
 
 
     res.status(200).json(results);
