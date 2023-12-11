@@ -143,7 +143,7 @@ steps:
   - |
       if [ -d "../infrastructure/environments/$BRANCH_NAME/" ]; then
         source /workspace/tf_outputs.sh
-        gcloud functions deploy $scraper_function_id --source=./dist
+        gcloud functions deploy $scraper_function_id --source=./dist --set-build-env-vars="GOOGLE_NODE_RUN_SCRIPTS="
       else
         echo "****************************** SKIPPING DEPLOY ********************************"
         echo "Branch '$BRANCH_NAME' does not represent an official environment."
