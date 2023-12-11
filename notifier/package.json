@@ -4,7 +4,7 @@
     "@google-cloud/storage": "^6.9.4",
     "node-fetch": "^3.3.2"
   },
-  "main": "dist/notifier/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "webpack -c webpack.config.js"
   },
