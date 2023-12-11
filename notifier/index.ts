@@ -48,7 +48,7 @@ async function notifyTeams(url: string, menus: RestaurantMenu[]) {
 function createTeamsCard(restaurantMenus: RestaurantMenu[]) {
     const now = new Date();
     const todayWeekday = now.getDay() as DayOfWeek;
-    let card = {
+    let card: any = {
         "type": "message",
         "attachments": [
             {
