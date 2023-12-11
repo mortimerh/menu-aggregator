@@ -86,12 +86,6 @@ steps:
       fi
 # [END tf-apply]      
 
-- id: 'Frontend: Install dependencies'
-  dir: 'frontend'
-  name: 'node'
-  entrypoint: 'npm'
-  args: ['install']
-
 - id: 'Frontend: Build app'
   dir: 'frontend'
   name: 'node'
@@ -107,6 +101,7 @@ steps:
         echo "Missing public base url. Falling back to local root ('.')."
         export PUBLIC_URL=.
       fi
+      npm install
       npm run build
 
 - id: 'Frontend: Deploy'
