@@ -145,8 +145,12 @@ steps:
 - id: 'Notifier: Build'
   name: 'node'
   dir: 'notifier'
-  entrypoint: 'npm'
-  args: ['install', 'run build']
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |
+      npm install
+      npm run build
      
 - id: 'Notifier: Deploy'
   dir: 'notifier'
