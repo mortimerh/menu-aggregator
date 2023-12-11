@@ -1,10 +1,12 @@
 const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   entry: {
     index: './index.ts'
   },
   target: 'node',
+  externals: [nodeExternals()],
   module: {
     rules: [
       {
@@ -18,22 +20,7 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   optimization: {
-    minimize: false,
-    splitChunks: {
-      cacheGroups: {
-        
-        shared: {
-          test: /[\\/]shared[\\/]/,
-          name: 'shared',
-          chunks: 'all'
-        },
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all'
-        },
-      }
-    }
+    minimize: false
   },
   output: {
     filename: '[name].js',
