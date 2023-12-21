@@ -3,9 +3,9 @@
     "@google-cloud/storage": "^6.9.4",
     "puppeteer": "^17.1.1"
   },
-  "main": "dist/index.js",
   "scripts": {
-    "build": "webpack -c webpack.config.js && cp package*.json dist/ && cd dist && npm install --omit=dev"
+    "build": "webpack -c webpack.config.js && cp package*.json dist/",
+    "gcp-build": ""
   },
   "devDependencies": {
     "ts-loader": "^9.5.1",
