@@ -16,8 +16,8 @@ export interface ScraperFilterConfig {
 
 export interface ScraperSiteConfig {
     name: string;
-    active: true,
-    url: "https://restaurangspill.se/",
+    active: true;
+    url: string;
     scraperRules: ScraperSiteRulesConfig[];
 }
 
@@ -30,5 +30,5 @@ export interface ScraperSiteRulesConfig {
 export interface ScraperRuleConfig {
     selectorType: SelectorType;
     selector: string;
-    filters: ScraperFilterConfig[];
+    filters?: ScraperFilterConfig[];
 }
